@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:layout_messenger/blocs/chat_screen_bloc/chat_bloc.dart';
+import 'package:layout_messenger/blocs/chat_screen_bloc/chat_state.dart';
+import 'package:layout_messenger/models/message.model.dart';
 import '../models/recent.model.dart';
-import 'package:faker/faker.dart';
 import '../widgets/widgets.dart';
 
 class ChatScreen extends StatelessWidget {
   static Route route(RecentMessages data) =>
       MaterialPageRoute(builder: (context) => ChatScreen(messageData: data));
 
-  const ChatScreen({super.key, required this.messageData});
+  ChatScreen({super.key, required this.messageData});
 
   final RecentMessages messageData;
+
+  var chat_bloc = ChatBloc();
 
   @override
   Widget build(BuildContext context) {
@@ -29,22 +33,67 @@ class ChatScreen extends StatelessWidget {
           actions: [AppBarChat(messageData: messageData)],
         ),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.only(left: 15.0, right: 15.0, bottom: 70.0),
-        child: Column(children: [
-          ChatBuddleReceiver(messageLeft: faker.conference.name()),
-          ChatBuddleSend(messageRight: faker.conference.name()),
-          ChatBuddleSend(messageRight: faker.conference.name()),
-          ChatBuddleReceiver(messageLeft: faker.conference.name()),
-          ChatBuddleReceiver(messageLeft: faker.conference.name()),
-          ChatBuddleReceiver(messageLeft: faker.conference.name()),
-          ChatBuddleSend(messageRight: faker.conference.name()),
-          ChatBuddleReceiver(messageLeft: faker.conference.name()),
-          ChatBuddleSend(messageRight: "Bye Bye"),
-          ChatBuddleSend(messageRight: "See you again!"),
-        ]),
+      body: StreamBuilder(
+        stream: chat_bloc.state,
+        builder: (context, snapshot) {
+          ChatState? state = snapshot.data;
+          if (snapshot.hasData) {
+            return Padding(
+              padding: EdgeInsets.only(left: 15.0, right: 15.0, bottom: 70),
+              child: Expanded(
+                child: ListView.builder(
+                  itemCount: state!.messages.length,
+                  itemBuilder: (context, index) {
+                    Message message = state.messages[index];
+                    return state.isBot
+                        ? ChatBuddleReceiver(messageLeft: message.text)
+                        : ChatBuddleSend(messageRight: message.text);
+                  },
+                ),
+              ),
+            );
+          } else {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 50),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: 100,
+                      height: 100,
+                      child: CircleAvatar(
+                        backgroundImage: NetworkImage(messageData.image),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      messageData.name,
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      "Facebook",
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Text("Các bạn là bạn bè trên facebook")
+                  ],
+                ),
+              ),
+            );
+          }
+        },
       ),
-      bottomSheet: ChatBottomSheet(),
+      bottomSheet: ChatBottomSheet(
+        chat_bloc: chat_bloc,
+      ),
     );
   }
 }

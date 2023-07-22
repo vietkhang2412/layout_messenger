@@ -7,12 +7,14 @@ class NavigationBarItem extends StatelessWidget {
     required this.icon,
     required this.index,
     required this.onTap,
+    this.isSelected = false,
   }) : super(key: key);
 
   final String label;
   final IconData icon;
   final int index;
   final ValueChanged<int> onTap;
+  final bool isSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,7 @@ class NavigationBarItem extends StatelessWidget {
           Icon(
             icon,
             size: 24,
-            color: (index == 0) ? Colors.blue : Colors.black,
+            color: (isSelected) ? Colors.blue : Colors.black,
           ),
           SizedBox(
             height: 8,
@@ -37,7 +39,7 @@ class NavigationBarItem extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: (index == 0) ? Colors.blue : Colors.black,
+              color: (isSelected) ? Colors.blue : Colors.black,
             ),
           )
         ],

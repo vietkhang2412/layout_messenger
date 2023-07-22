@@ -30,8 +30,7 @@ class MessengesPage extends StatelessWidget {
                       child: _StoryItem(
                           storyData: Story(
                               name: faker.person.name(),
-                              url: faker.image
-                                  .image(width: 50, height: 50, random: true))),
+                              url: "https://picsum.photos/200/300")),
                     );
                   }),
             ),
